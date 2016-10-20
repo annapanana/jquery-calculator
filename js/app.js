@@ -102,22 +102,23 @@ function doMath(equation) {
 function checkForErrors(str) {
 
   console.log(isNaN(Number(str[0])));
-  if (Number(str[0])) {
+  if (!Number(str[0])) {
     return "Error";
   }
 
-  if (Number([str.length-1])) {
-    return "Error";
-  }
+  if (str.length > 1) {
+    if (!Number([str.length-1])) {
+      return "Error";
+    }
 
-  function checkError(arr) {
     for (var i = 0; i < str.length; i++) {
-      if (Number(arr[i])) {
-        if (Number(arr[i+1])) {
+      if (!Number(str[i])) {
+        if (!Number(str[i+1])) {
           return "Error";
         }
       }
     }
   }
+
   return str;
 }
