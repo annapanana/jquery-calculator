@@ -2,6 +2,7 @@
 "use strict";
 // add event handlers
 $(function() {
+  // mouse input
   $(".buttons").on("click", function() {
     if (event.target.nodeName === "SPAN")
       evaluate($(event.target).text());
@@ -10,11 +11,10 @@ $(function() {
 function evaluate(key) {
   if (key === "x") key = "*";
   if (key === "÷") key = "/";
-  console.log(key);
   switch (key) {
     case "=":
-      doMath($("#screen").text());
-      overWriteDisplay(eval($("#screen").text()));
+      // doMath($("#screen").text());
+      overWriteDisplay(doMath($("#screen").text()));
       break;
     case "C":
       overWriteDisplay("");
@@ -51,15 +51,73 @@ function doMath(equation) {
   // the last part of the equation is the substring, add it
   equationBody.push(subString);
 
+  // check for errors
+  equationBody = checkForErrors(equationBody);
+  if (equationBody === "Error") {
+    return "Error";
+  };
 
+  // execute equation with order of operations
+  equationBody = firstOrderOfOperations(equationBody);
+  equationBody = secondOrderOfOperations(equationBody);
 
-  // reorganize equation to follow order of operations
-  // for (var i = 0; i < equationBody.length; i++) {
-  //   if (equationBody[i] === "/" || equationBody[i] === "*") {
-  //     var equationBody.splice(i-1, i+1);
-  //
-  //   }
-  // }
-  console.log(equationBody);
-  // return result;
+  // perform multiplication and division operations
+  function firstOrderOfOperations(arr) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] === "*") {
+        arr[i] = arr[i-1] * arr[i+1];
+        // remove the numbers that were used in the multiplaction and call this function again to check for additional * or / operators
+        firstOrderOfOperations(removeExtraNums(arr, i));
+      } else if (arr[i] === "/") {
+        arr[i] = arr[i-1] / arr[i+1];
+        firstOrderOfOperations(removeExtraNums(arr, i));
+      }
+    }
+    return arr;
+  }
+
+  function secondOrderOfOperations(arr) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] === "+") {
+        arr[i] = Number(arr[i-1]) + Number(arr[i+1]);
+        secondOrderOfOperations(removeExtraNums(arr, i));
+      } else if (arr[i] === "-") {
+        arr[i] = arr[i-1] - arr[i+1];
+        secondOrderOfOperations(removeExtraNums(arr, i));
+      }
+    }
+    return arr;
+  }
+
+  function removeExtraNums(arr, i) {
+    // remove the left side of the operator
+    arr.splice(i-1, 1);
+    // the array was modified such that i is now the right side of the former * operator
+    arr.splice(i, 1);
+    return arr;
+  }
+  return equationBody;
+}
+
+function checkForErrors(str) {
+
+  console.log(isNaN(Number(str[0])));
+  if (Number(str[0])) {
+    return "Error";
+  }
+
+  if (Number([str.length-1])) {
+    return "Error";
+  }
+
+  function checkError(arr) {
+    for (var i = 0; i < str.length; i++) {
+      if (Number(arr[i])) {
+        if (Number(arr[i+1])) {
+          return "Error";
+        }
+      }
+    }
+  }
+  return str;
 }
