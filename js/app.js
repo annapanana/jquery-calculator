@@ -1,19 +1,19 @@
 
 "use strict";
-// add event handlers
+
 $(function() {
-  // mouse input
+  // mouse input event listener
   $(".buttons").on("click", function() {
     if (event.target.nodeName === "SPAN")
       evaluate($(event.target).text());
   });
 });
+
 function evaluate(key) {
-  if (key === "x") key = "*";
+  if (key === "x") key = "*"; // use replace!
   if (key === "÷") key = "/";
   switch (key) {
     case "=":
-      // doMath($("#screen").text());
       overWriteDisplay(doMath($("#screen").text()));
       break;
     case "C":
@@ -101,7 +101,6 @@ function doMath(equation) {
 
 function checkForErrors(str) {
 
-  console.log(isNaN(Number(str[0])));
   if (!Number(str[0])) {
     return "Error";
   }
